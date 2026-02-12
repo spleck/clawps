@@ -17,7 +17,7 @@ stale   Daily SPA Generator                  kimi-k2.5         250K/250K   4h   
 
 ```bash
 # Clone or download
-git clone https://github.com/YOUR_USERNAME/clawps.git
+git clone https://github.com/spleck/clawps.git
 cd clawps
 
 # Make executable and link to your PATH
