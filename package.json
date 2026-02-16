@@ -1,15 +1,16 @@
 {
   "name": "clawps",
   "version": "1.0.0",
-  "description": "List OpenClaw sessions like the ps command",
+  "description": "OpenClaw session utilities, in the style of the procps package",
   "main": "clawps.js",
   "bin": {
-    "clawps": "./clawps.js"
+    "clawps": "./clawps.js",
+    "clawtop": "./clawtop.js"
   },
   "scripts": {
     "install": "node install.js"
   },
-  "keywords": ["openclaw", "cli", "sessions"],
+  "keywords": ["openclaw", "cli", "sessions", "procps", "utilities"],
   "author": "Kevin Smith",
   "license": "MIT",
   "engines": {

@@ -1,16 +1,27 @@
 # clawps 🐾
 
-A `ps`-like command for [OpenClaw](https://openclaw.ai) sessions.
+A procps-style package of utilities for [OpenClaw](https://openclaw.ai) sessions.
 
 ```
 $ clawps
 
 STATUS  AGENT                                MODEL             CONTEXT     IDLE      CHANNEL     KIND
 -------------------------------------------------------------------------------------------------------------
-active  Kevin Smith (@spleck) id:7188231559  kimi-k2.5         15K/250K    2m        telegram    other
+active  Kevin Smith (@spleck)                kimi-k2.5         15K/250K    2m        telegram    other
 stale   Daily SPA Generator                  kimi-k2.5         250K/250K   4h        cron        other
 -----------------------------------------------------------------------------------------------------------
 2 sessions
+```
+
+```
+$ clawtop
+
+  PID   SESSIONS                          MODEL        CPU    MSGS    CTX/MAX    UPTIME
+-------------------------------------------------------------------------------------------------
+ 1699   Kevin Smith (main)                minimax-m2.5  0.1    142     45K/250K   12m
+ 1705   pm-daily-spas (isolated)          kimi-k2.5     0.0    28      12K/250K   4h
+-------------------------------------------------------------------------------------------------
+Total: 2 sessions | Context: 57K/500K (11%)
 ```
 
 ## Installation
@@ -23,6 +34,9 @@ cd clawps
 # Make executable and link to your PATH
 chmod +x clawps.js
 ln -s $(pwd)/clawps.js ~/.local/bin/clawps
+
+chmod +x clawtop.js
+ln -s $(pwd)/clawtop.js ~/.local/bin/clawtop
 
 # Or install globally via npm
 npm link
@@ -39,7 +53,11 @@ export PATH="$HOME/.local/bin:$PATH"
 - OpenClaw gateway running (default: localhost:18789)
 - Gateway auth token read from `~/.openclaw/openclaw.json`
 
-## Usage
+## Utilities
+
+### clawps
+
+Process-style session listing.
 
 ```bash
 clawps              # Basic session listing
@@ -50,7 +68,20 @@ clawps -w -n5       # Watch mode, refresh every 5 seconds
 clawps --no-color   # Disable colors
 ```
 
+### clawtop
+
+Top-style real-time session monitor.
+
+```bash
+clawtop             # Real-time monitoring (default 3s refresh)
+clawtop -n5         # Refresh every 5 seconds
+clawtop --json      # JSON output for scripting
+clawtop --no-color  # Disable colors
+```
+
 ## Output
+
+### clawps
 
 | Column | Description |
 |--------|-------------|
@@ -62,9 +93,23 @@ clawps --no-color   # Disable colors
 | CHANNEL | Communication channel |
 | KIND | Session type |
 
+### clawtop
+
+| Column | Description |
+|--------|-------------|
+| PID | Process/Session ID |
+| SESSIONS | Session name and type |
+| MODEL | AI model in use |
+| CPU | Estimated CPU usage |
+| MSGS | Message count this session |
+| CTX/MAX | Context usage |
+| UPTIME | Session runtime |
+
 ## How It Works
 
-`clawps` queries your local OpenClaw gateway via the `sessions_list` tool and formats the output like the Unix `ps` command.
+Both tools query your local OpenClaw gateway via the `sessions_list` tool:
+- `clawps` — formats sessions like Unix `ps`
+- `clawtop` — monitors like Unix `top`
 
 ## License
 
