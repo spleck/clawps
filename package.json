@@ -7,9 +7,7 @@
     "clawps": "./clawps.js",
     "clawtop": "./clawtop.js"
   },
-  "scripts": {
-    "install": "node install.js"
-  },
+  "scripts": {},
   "keywords": ["openclaw", "cli", "sessions", "procps", "utilities"],
   "author": "Kevin Smith",
   "license": "MIT",
