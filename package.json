@@ -1,6 +1,6 @@
 {
   "name": "clawps",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "OpenClaw session utilities, in the style of the procps package",
   "main": "clawps.js",
   "bin": {
@@ -8,7 +8,13 @@
     "clawtop": "./clawtop.js"
   },
   "scripts": {},
-  "keywords": ["openclaw", "cli", "sessions", "procps", "utilities"],
+  "keywords": [
+    "openclaw",
+    "cli",
+    "sessions",
+    "procps",
+    "utilities"
+  ],
   "author": "Kevin Smith",
   "license": "MIT",
   "engines": {
