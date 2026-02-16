@@ -233,7 +233,7 @@ function getStatusIndicator(session) {
   if (idle < 30 * 60 * 1000) {
     return color('yellow', '○');
   }
-  return color('red', '○');
+  return color('gray', '○');
 }
 
 function truncate(str, len) {
@@ -292,7 +292,7 @@ async function listSessions() {
       });
       
       console.log(color('dim', '═'.repeat(100)));
-      console.log(`${color('green', '●')} Active  ${color('yellow', '○')} Idle  ${color('red', '○')} Stale`);
+      console.log(`${color('green', '●')} Active  ${color('yellow', '○')} Idle  ${color('gray', '○')} Stale`);
       console.log();
     } else {
       // Compact ps-like format
@@ -333,7 +333,7 @@ async function listSessions() {
         } else if (idle < 30 * 60 * 1000) {
           statusStr = color('yellow', 'idle'.padEnd(8));
         } else {
-          statusStr = color('red', 'stale'.padEnd(8));
+          statusStr = color('gray', 'stale'.padEnd(8));
         }
         
         const row = [
