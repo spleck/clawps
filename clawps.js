@@ -85,6 +85,40 @@ function getGatewayConfig() {
   }
 }
 
+// Read sessions directly from sessions.json (like CLI does)
+function getSessionsFromFile() {
+  const sessionsPath = path.join(os.homedir(), '.openclaw', 'agents', 'main', 'sessions', 'sessions.json');
+  try {
+    const data = fs.readFileSync(sessionsPath, 'utf8');
+    const sessionsObj = JSON.parse(data);
+    
+    const sessions = Object.entries(sessionsObj).map(([key, session]) => ({
+      key: key,
+      channel: session.channel || 'unknown',
+      displayName: session.displayName || key,
+      updatedAt: session.updatedAt || session.lastMessageAt || 0,
+      sessionId: session.sessionId || key,
+      model: session.model || 'unknown',
+      contextTokens: session.contextWindow || session.contextTokens || 0,
+      totalTokens: session.totalTokens || 0,
+      kind: session.kind || 'other',
+      deliveryContext: session.deliveryContext || {},
+      systemSent: session.systemSent || false,
+      abortedLastRun: session.abortedLastRun || false,
+      lastChannel: session.lastChannel || session.channel || '',
+      lastTo: session.lastTo || '',
+      lastAccountId: session.lastAccountId || '',
+      transcriptPath: session.transcriptPath || ''
+    }));
+    
+    // Sort by updatedAt descending
+    sessions.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+    return sessions;
+  } catch (err) {
+    return [];
+  }
+}
+
 function invokeTool(tool, args = {}) {
   return new Promise((resolve, reject) => {
     const { port, token } = getGatewayConfig();
@@ -210,7 +244,7 @@ function truncate(str, len) {
 
 async function listSessions() {
   try {
-    const sessions = await invokeTool('sessions_list', {});
+    const sessions = getSessionsFromFile();
 
     if (options.json) {
       console.log(JSON.stringify(sessions, null, 2));
