@@ -32,6 +32,7 @@ const options = {
   help: args.includes('-h') || args.includes('--help'),
   json: args.includes('--json'),
   watch: args.includes('-w') || args.includes('--watch'),
+  all: args.includes('-a') || args.includes('--all'),
   interval: 2000, // ms for watch mode
 };
 
@@ -49,15 +50,16 @@ Usage: clawps [options]
 Options:
   -h, --help       Show this help message
   -v, --verbose    Show detailed session information
+  -a, --all        Include stale sessions (older than 30 min)
   --no-color       Disable colored output
   --json           Output as JSON
   -w, --watch      Refresh continuously (like watch command)
   -n<secs>         Watch interval in seconds (default: 2)
 
 Examples:
-  clawps              # Basic session listing
+  clawps              # Active sessions only
+  clawps -a           # Include stale sessions
   clawps -v           # Verbose output
-  clawps --no-color   # Plain text output
   clawps -w -n5       # Refresh every 5 seconds
 `);
 }
@@ -246,17 +248,25 @@ async function listSessions() {
   try {
     const sessions = getSessionsFromFile();
 
-    if (options.json) {
-      console.log(JSON.stringify(sessions, null, 2));
-      return;
-    }
-
-    if (sessions.length === 0) {
-      console.log(color('dim', 'No active sessions.'));
-      return;
-    }
-
+    // Filter out stale sessions unless --all is specified
     const now = Date.now();
+    const staleThreshold = 30 * 60 * 1000; // 30 minutes
+    const activeSessions = options.all 
+      ? sessions 
+      : sessions.filter(s => now - (s.updatedAt || 0) < staleThreshold);
+
+    if (options.json) {
+      console.log(JSON.stringify(activeSessions, null, 2));
+      return;
+    }
+
+    if (activeSessions.length === 0) {
+      console.log(color('dim', 'No active sessions.'));
+      if (!options.all) {
+        console.log(color('dim', 'Use -a to show stale sessions.'));
+      }
+      return;
+    }
 
     if (options.verbose) {
       // Verbose table format
@@ -264,7 +274,7 @@ async function listSessions() {
       console.log(color('bright', 'OpenClaw Sessions'));
       console.log(color('dim', '═'.repeat(100)));
       
-      sessions.forEach((s, i) => {
+      activeSessions.forEach((s, i) => {
         const idle = now - (s.updatedAt || 0);
         const status = getStatusIndicator(s);
         const agentName = getAgentName(s);
@@ -288,7 +298,7 @@ async function listSessions() {
           console.log(`   ${color('red', '⚠ Last run aborted')}`);
         }
         
-        if (i < sessions.length - 1) console.log();
+        if (i < activeSessions.length - 1) console.log();
       });
       
       console.log(color('dim', '═'.repeat(100)));
@@ -316,7 +326,7 @@ async function listSessions() {
       console.log(color('dim', '-'.repeat(widths.reduce((a, b) => a + b, 0) + 2)));
       
       // Rows
-      sessions.forEach(s => {
+      activeSessions.forEach(s => {
         const idle = now - (s.updatedAt || 0);
         const idleStr = formatDuration(idle);
         const agentName = getAgentName(s);
@@ -351,7 +361,7 @@ async function listSessions() {
       });
       
       console.log(color('dim', '-'.repeat(widths.reduce((a, b) => a + b, 0))));
-      console.log(`${sessions.length} session${sessions.length !== 1 ? 's' : ''}`);
+      console.log(`${activeSessions.length} session${activeSessions.length !== 1 ? 's' : ''}${!options.all ? ' (run clawps -a to see stale)' : ''}`);
       console.log();
     }
   } catch (err) {

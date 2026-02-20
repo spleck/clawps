@@ -1,6 +1,6 @@
 {
   "name": "clawps",
-  "version": "1.0.1",
+  "version": "1.2.2",
   "description": "OpenClaw session utilities, in the style of the procps package",
   "main": "clawps.js",
   "bin": {
