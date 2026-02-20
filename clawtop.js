@@ -38,7 +38,8 @@ const CONFIG = {
   reverse: false,
   maxSessions: 20,
   showSystem: true,
-  color: true
+  color: true,
+  showAll: false
 };
 
 // State
@@ -463,6 +464,7 @@ Options:
   -n, --iterations N   Number of iterations (default: infinite)
   -d, --delay N        Delay in seconds between updates (default: 2)
   -s, --sort FIELD     Sort by: cpu, mem, idle, tokens, name (default: cpu)
+  -a, --all            Include stale sessions (older than 30 min)
   --no-color           Disable colored output
   --no-system          Hide system info
   -h, --help           Show this help
@@ -492,6 +494,8 @@ Examples:
       Object.keys(C).forEach(k => C[k] = '');
     } else if (arg === '--no-system') {
       CONFIG.showSystem = false;
+    } else if (arg === '-a' || arg === '--all') {
+      CONFIG.showAll = true;
     }
   }
   
@@ -589,6 +593,13 @@ Examples:
       let error = null;
       try {
         sessions = getSessionsFromFile();
+        
+        // Filter out stale sessions unless --all is specified
+        const now = Date.now();
+        const staleThreshold = 30 * 60 * 1000; // 30 minutes
+        if (!CONFIG.showAll) {
+          sessions = sessions.filter(s => now - (s.updatedAt || 0) < staleThreshold);
+        }
       } catch (err) {
         error = err.message;
       }
